@@ -4,6 +4,8 @@
 #include <map>
 #include <memory>
 #include <list>
+#include <deque>
+#include <vector>
 
 #include <boost/variant.hpp>
 
@@ -12,6 +14,12 @@ class Feature;
 class Human
 {
 public:
+	struct Pattern
+	{
+		int label;
+		std::vector<double> features;
+	};
+
 	Human(int id);
 	~Human();
 
@@ -19,9 +27,9 @@ public:
 
 	/// engaged can be [0, 1, 2]
 	void update(const Eigen::Vector2d &pos, double rot, double facerot, int engaged);
-	void setLabel(const std::string &label);
+	void setLabel(int label);
 
-	std::list< std::list< double > > labelledStfPatterns() const;
+	std::list< Pattern > labelledStfPatterns() const;
 
 private:
 	int m_id;
@@ -35,8 +43,8 @@ private:
 	bool m_initialPosIsSet;
 
 	std::map<std::string, std::shared_ptr<Feature> > m_features;
-	std::list<std::string> m_labels;
-	std::string m_currentLabel;
+	std::deque<int> m_labels;
+	int m_currentLabel;
 
 };
 

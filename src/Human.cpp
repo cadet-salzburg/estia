@@ -1,8 +1,7 @@
 #include "Human.h"
 
 #include <list>
-#include <boost/fusion/algorithm/transformation/zip.hpp>
-#include <boost/fusion/include/zip.hpp>
+#include <deque>
 
 #include "Feature.h"
 
@@ -76,16 +75,17 @@ void Human::update(const Eigen::Vector2d &pos, double rot, double facerot, int e
 	
 }
 
-void Human::setLabel(const std::string &label)
+void Human::setLabel(int label)
 {
 	m_currentLabel = label;
 }
 
-std::list< std::list< double > > Human::labelledStfPatterns() const
+std::list< Human::Pattern > Human::labelledStfPatterns() const
 {
 	// making a list with each feature's mean and std histories
 	// --> list will contain [vel_mag.means, vel_mag.stds, rot.means, rot.stds, ...]
 	std::list< std::deque<double> > featureParams;
+	std::deque<int> labels = m_labels;
 	
 	for (auto &featureTuple : m_features)
 	{
@@ -100,27 +100,32 @@ std::list< std::list< double > > Human::labelledStfPatterns() const
 	//   zipped = [list(z) for z in zipped]
 	// will result in a list of patterns, each pattern a vector of values at a point in time
 
-	std::list< std::vector<double> > patterns;
+	std::list< Pattern > patterns;
 	while (!featureParams.front().empty())
 	{
-		std::vector<double> pattern;
+		Pattern pattern;
 
 		for (auto paramList : featureParams)
 		{
 			if (paramList.empty())
 			{
 				std::cerr << "feature parameter list is empty (unexpected)!" << std::endl;
-				pattern.push_back(0.0);
+				pattern.features.push_back(0.0);
 			}
 			else
 			{
 				double curParam = paramList.front();
-				pattern.push_back(curParam);
+				pattern.features.push_back(curParam);
 				paramList.pop_front();
 			}
 		}
 
+		pattern.label = labels.back();
+		labels.pop_back();
+
 		patterns.push_back(pattern);
 
 	}
+
+	return patterns;
 }

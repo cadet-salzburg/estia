@@ -14,10 +14,12 @@
     <ClCompile Include="..\src\Feature.cpp" />
     <ClCompile Include="..\src\Human.cpp" />
     <ClCompile Include="..\src\EstiaBundle.cpp" />
+    <ClCompile Include="..\src\Modeller.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Feature.h" />
     <ClInclude Include="..\src\Human.h" />
+    <ClInclude Include="..\src\Modeller.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9715AAC5-CDCD-4DD6-AF27-97E45B5547C0}</ProjectGuid>
