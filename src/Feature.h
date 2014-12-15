@@ -15,8 +15,8 @@ public:
 	~Feature();
 	void updateWithValue(double value, bool computeStats = true, int numFrames = 3);
 
-	const std::vector<double>& stfMeans() const { return m_means; }
-	const std::vector<double>& stfStds() const { return m_stds; }
+	const std::deque<double>& stfMeans() const { return m_means; }
+	const std::deque<double>& stfStds() const { return m_stds; }
 	double ltfMean() const;
 	double ltfStd() const;
 
@@ -27,7 +27,7 @@ private:
 		doubleAcc;
 	doubleAcc m_accStf, m_accLtf;
 	std::deque<double> m_history;
-	std::vector<double> m_means, m_stds;
+	std::deque<double> m_means, m_stds;
 
 	void pushValue(double value);
 };

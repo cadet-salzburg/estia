@@ -1,6 +1,8 @@
 #include "Human.h"
 
 #include <list>
+#include <boost/fusion/algorithm/transformation/zip.hpp>
+#include <boost/fusion/include/zip.hpp>
 
 #include "Feature.h"
 
@@ -69,5 +71,56 @@ void Human::update(const Eigen::Vector2d &pos, double rot, double facerot, int e
 
 	m_features["facerot"]->updateWithValue(facerot);
 	m_features["engaged"]->updateWithValue(engaged);
+
+	m_labels.push_front(m_currentLabel);
 	
+}
+
+void Human::setLabel(const std::string &label)
+{
+	m_currentLabel = label;
+}
+
+std::list< std::list< double > > Human::labelledStfPatterns() const
+{
+	// making a list with each feature's mean and std histories
+	// --> list will contain [vel_mag.means, vel_mag.stds, rot.means, rot.stds, ...]
+	std::list< std::deque<double> > featureParams;
+	
+	for (auto &featureTuple : m_features)
+	{
+		auto key = featureTuple.first;
+		auto feature = featureTuple.second;
+		featureParams.push_back(feature->stfMeans());
+		featureParams.push_back(feature->stfStds());
+	}
+
+	// the following is equivalent to the following 2 lines in python:
+	//   zipped = zip(*self.stf_features())
+	//   zipped = [list(z) for z in zipped]
+	// will result in a list of patterns, each pattern a vector of values at a point in time
+
+	std::list< std::vector<double> > patterns;
+	while (!featureParams.front().empty())
+	{
+		std::vector<double> pattern;
+
+		for (auto paramList : featureParams)
+		{
+			if (paramList.empty())
+			{
+				std::cerr << "feature parameter list is empty (unexpected)!" << std::endl;
+				pattern.push_back(0.0);
+			}
+			else
+			{
+				double curParam = paramList.front();
+				pattern.push_back(curParam);
+				paramList.pop_front();
+			}
+		}
+
+		patterns.push_back(pattern);
+
+	}
 }
