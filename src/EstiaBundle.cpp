@@ -34,14 +34,6 @@ void getBundleMetainfo(_2Real::bundle::BundleMetainfo &info)
 		_2Real::declareField("attentionLtf", "int")
 	});
 
-	info.exportsType("humansList", {
-		_2Real::declareField("humans", "list of humans")
-	});
-
-	info.exportsType("attentivesList", {
-		_2Real::declareField("attentives", "list of attentives")
-	});
-
 	info.exportsBlock("attentionEstimator", 
 	{ _2Real::declareInlet("humans") },
 	{ _2Real::declareOutlet("attentives") },
