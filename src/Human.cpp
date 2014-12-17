@@ -7,9 +7,11 @@
 
 using namespace Eigen;
 
-Human::Human(int id) : 
+Human::Human(uint32_t id) : 
 	m_id(id),
-	m_initialPosIsSet(false)
+	m_initialPosIsSet(false),
+	m_lifetime(.0f),
+	m_timeSinceLastUpdate(.0f)
 {
 }
 
@@ -73,11 +75,27 @@ void Human::update(const Eigen::Vector2d &pos, double rot, double facerot, int e
 
 	m_labels.push_front(m_currentLabel);
 	
+	setTimeSinceLastUpdate(.0f);
 }
 
-void Human::setLabel(int label)
+void Human::setLabel(uint8_t label)
 {
 	m_currentLabel = label;
+}
+
+Human::Pattern Human::currentStfPattern() const
+{
+	Pattern pattern;
+
+	for (auto &featureTuple : m_features)
+	{
+		auto key = featureTuple.first;
+		auto feature = featureTuple.second;		
+		pattern.features.push_back(feature->stfMeans().back());
+		pattern.features.push_back(feature->stfStds().back());
+	}
+
+	return pattern;
 }
 
 std::list< Human::Pattern > Human::labelledStfPatterns() const

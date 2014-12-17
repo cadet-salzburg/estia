@@ -11,15 +11,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\lib\libsvm\svm.cpp" />
     <ClCompile Include="..\src\Feature.cpp" />
     <ClCompile Include="..\src\Human.cpp" />
     <ClCompile Include="..\src\EstiaBundle.cpp" />
     <ClCompile Include="..\src\Modeller.cpp" />
+    <ClCompile Include="..\src\ModellingBlock.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\lib\libsvm\svm.h" />
     <ClInclude Include="..\src\Feature.h" />
     <ClInclude Include="..\src\Human.h" />
     <ClInclude Include="..\src\Modeller.h" />
+    <ClInclude Include="..\src\ModellingBlock.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9715AAC5-CDCD-4DD6-AF27-97E45B5547C0}</ProjectGuid>
@@ -65,7 +69,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;PYTHIABUNDLE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>E:\libs\eigen_3_2_2;$(BOOST_DIR);$(_2REAL_FRAMEWORK_DIR)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\libs\libsvm;E:\libs\eigen_3_2_2;$(BOOST_DIR);$(_2REAL_FRAMEWORK_DIR)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

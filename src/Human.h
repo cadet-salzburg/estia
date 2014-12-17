@@ -9,33 +9,61 @@
 
 #include <boost/variant.hpp>
 
+#define DISAPPEAR_AFTER 2.0f
+
 class Feature;
 
 class Human
 {
 public:
+
 	struct Pattern
 	{
 		int label;
 		std::vector<double> features;
 	};
 
-	Human(int id);
+	struct HumanFrame
+	{
+		uint64_t frame;
+		uint32_t id;
+		Eigen::Vector2d pos;
+		double rot;
+		double facerot;
+		uint8_t engaged;
+	};
+
+	Human(uint32_t id);
 	~Human();
 
 	void setup();
 
 	/// engaged can be [0, 1, 2]
 	void update(const Eigen::Vector2d &pos, double rot, double facerot, int engaged);
-	void setLabel(int label);
+	void setLabel(uint8_t label);
 
 	std::list< Pattern > labelledStfPatterns() const;
+	Pattern currentStfPattern() const;
+
+	void setLifetime(float f) { m_lifetime = f; }
+	float lifetime() const { return m_lifetime; }
+	void setTimeSinceLastUpdate(float f) { m_timeSinceLastUpdate = f; }
+	float timeSinceLastUpdate() const { return m_timeSinceLastUpdate; }
+	uint32_t id() const { return m_id; }
+
+	uint8_t predictionStf() const { return m_predictionStf; }
+	uint8_t predictionLtf() const { return m_predictionLtf; }
+
+	void setPredictionStf(uint8_t i) { m_predictionStf = i; }
+	void setPredictionLtf(uint8_t i) { m_predictionLtf = i; }
 
 private:
-	int m_id;
+	uint32_t m_id;
 	Eigen::Vector2d m_pos;
 	Eigen::Vector2d m_initialPos;
 	Eigen::Vector2d m_velVec;
+	float m_lifetime;
+	float m_timeSinceLastUpdate;
 
 	/// total distance travelled
 	double m_totalDistanceTravelled;
@@ -44,7 +72,8 @@ private:
 
 	std::map<std::string, std::shared_ptr<Feature> > m_features;
 	std::deque<int> m_labels;
-	int m_currentLabel;
+	uint8_t m_currentLabel;
 
+	uint8_t m_predictionStf, m_predictionLtf;
 };
 

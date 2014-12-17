@@ -14,24 +14,25 @@ void getBundleMetainfo(_2Real::bundle::BundleMetainfo &info)
 
 	_2Real::HumanReadableNameVisitor name;
 
-	info.exportsType("vec3", {
+	info.exportsType("vec2", {
 		_2Real::declareField("x", "double"),
-		_2Real::declareField("y", "double"),
-		_2Real::declareField("z", "double")
+		_2Real::declareField("y", "double")
 	});
 
 	info.exportsType("human", {
-		_2Real::declareField("id", "int"),
-		_2Real::declareField("pos", "vec3"),
+		_2Real::declareField("frame", "ulong"),
+		_2Real::declareField("id", "uint"),
+		_2Real::declareField("pos", "vec2"),
+		_2Real::declareField("rot", "double"),
 		_2Real::declareField("facerot", "double"),
-		_2Real::declareField("engaged", "int")
+		_2Real::declareField("engaged", "uchar")
 	});
 
 	info.exportsType("attentive", {
-		_2Real::declareField("id", "int"),
-		_2Real::declareField("pos", "vec3"),
-		_2Real::declareField("attentionStf", "int"),
-		_2Real::declareField("attentionLtf", "int")
+		_2Real::declareField("id", "uint"),
+		_2Real::declareField("pos", "vec2"),
+		_2Real::declareField("attentionStf", "uchar"),
+		_2Real::declareField("attentionLtf", "uchar")
 	});
 
 	info.exportsBlock("attentionEstimator", 

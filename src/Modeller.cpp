@@ -6,6 +6,7 @@
 #include <chrono>
 #include <sstream>
 #include <iomanip>
+#include <thread>
 
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
@@ -50,12 +51,14 @@ Modeller::~Modeller()
 void Modeller::readProblem(const std::string &filenameStr,
 	svm_problem &prob, svm_parameter &param, svm_node *x_space)
 {
+#pragma warning(push)
+#pragma warning(disable: 4996)
 
 	const char *filename = filenameStr.c_str();
 
 	int max_index, inst_max_index, i;
 	size_t elements, j;
-	FILE *fp = fopen(filename,"r");
+	FILE *fp = fopen(filename, "r");
 	char *endptr;
 	char *idx, *val, *label;
 
@@ -153,6 +156,8 @@ void Modeller::readProblem(const std::string &filenameStr,
 		}
 
 	fclose(fp);
+
+#pragma warning(pop)
 }
 
 void Modeller::trainSvm()
@@ -160,7 +165,7 @@ void Modeller::trainSvm()
 	std::stringstream filenameStf;
 	filenameStf << m_filenameBase << "_stf.txt";
 
-	svm_node *xspaceStf;
+	svm_node *xspaceStf = nullptr;
 	svm_problem probStf;
 	svm_parameter paramStf;
 
@@ -168,9 +173,9 @@ void Modeller::trainSvm()
 	m_modelStf = svm_train(&probStf, &paramStf);
 }
 
-double Modeller::predict(const Human::Pattern &pattern, Modeller::ATTENTION_TYPE type)
+uint8_t Modeller::predict(const Human::Pattern &pattern, Modeller::AttentionType type)
 {
-	const svm_model *model = type == ATTENTION_TYPE::STF ? m_modelStf : m_modelLtf;
+	const svm_model *model = type == AttentionType::STF ? m_modelStf : m_modelLtf;
 
 	if (model != nullptr)
 	{
@@ -183,11 +188,16 @@ double Modeller::predict(const Human::Pattern &pattern, Modeller::ATTENTION_TYPE
 		}
 
 		double stfPrediction = svm_predict(model, node);
+		return static_cast<uint8_t>(stfPrediction);
 	}
+	return 0;
 }
 
 void Modeller::savePatterns()
 {
+#pragma warning(push)
+#pragma warning(disable: 4996)
+
 	auto now = std::chrono::system_clock::now();
 	auto now_c = std::chrono::system_clock::to_time_t(now);
 	std::stringstream filename;
@@ -210,4 +220,60 @@ void Modeller::savePatterns()
 	}
 
 	svmdata.close();
+
+#pragma warning(pop)
+}
+
+Modeller::Predictions Modeller::updateWithFrame(const Human::HumanFrame &humanFrame)
+{
+	if (m_humans.find(humanFrame.id) == m_humans.end())
+	{
+		m_humans[humanFrame.id] = std::make_shared<Human>(humanFrame.id);
+	}
+
+	auto human = m_humans[humanFrame.id];
+	human->update(humanFrame.pos, humanFrame.rot, humanFrame.facerot, humanFrame.engaged);
+
+	Predictions predictions;
+
+	if (applicationMode() == ApplicationMode::PREDICT)
+	{
+		uint8_t predictionStf = predict(human->currentStfPattern(), AttentionType::STF);	
+		human->setPredictionStf(predictionStf);
+		predictions.stf = static_cast<StfClass>(predictionStf);
+	}
+
+	return predictions;
+}
+
+void Modeller::updateFixed(float dt)
+{
+	std::lock_guard<std::mutex> lock(m_humansMutex);
+
+	std::list<uint32_t> toDelete;
+
+	for (auto &kv : m_humans)
+	{
+		auto human = kv.second;
+		human->setLifetime(human->lifetime() + dt);
+		human->setTimeSinceLastUpdate(human->timeSinceLastUpdate() + dt);
+		if (human->timeSinceLastUpdate() > DISAPPEAR_AFTER)
+		{
+			toDelete.push_back(human->id());
+		}
+	}
+
+	for (auto humanToDelete : toDelete)
+	{
+		auto humanIt = m_humans.find(humanToDelete);
+
+		if (applicationMode() == ApplicationMode::COLLECT)
+		{
+			auto human = humanIt->second;
+			auto stfPatterns = human->labelledStfPatterns();
+			m_patternsStf.insert(m_patternsStf.end(), stfPatterns.begin(), stfPatterns.end());
+		}
+
+		m_humans.erase(humanIt);
+	}
 }
