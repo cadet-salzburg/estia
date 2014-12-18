@@ -27,5 +27,6 @@ private:
 
 	std::shared_ptr<HumanListener> m_oscListener;
 	std::shared_ptr<UdpListeningReceiveSocket> m_udpSocket;
+	std::map<uint32_t, uint64_t> m_frameNumbers;
 };
 

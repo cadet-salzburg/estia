@@ -56,9 +56,12 @@ void Modelling::setup()
 void Modelling::update()
 {
 	auto inlet = std::dynamic_pointer_cast<_2Real::bundle::InletHandle>(mIo.mInlets[0]);
+	auto labelsInlet = std::dynamic_pointer_cast<_2Real::bundle::InletHandle>(mIo.mInlets[1]);
 	auto outlet = mIo.mOutlets[0];
 
 	const _2Real::CustomDataItem &val_in = boost::get<_2Real::CustomDataItem>(inlet->getValue());
+	const _2Real::CustomDataItem &label_in = 
+		boost::get<_2Real::CustomDataItem>(labelsInlet->getValue());
 
 	Human::HumanFrame humanFrame;
 
@@ -79,6 +82,12 @@ void Modelling::update()
 	val_out.getValue<_2Real::CustomDataItem>("pos") = pos;
 	val_out.getValue<uint8_t>("attentionStf") = static_cast<uint8_t>(predictions.stf);
 	val_out.getValue<uint8_t>("attentionLtf") = static_cast<uint8_t>(predictions.ltf);
+
+
+	if (m_modeller->applicationMode() == Modeller::ApplicationMode::COLLECT)
+	{
+		
+	}
 }
 
 void Modelling::shutdown()

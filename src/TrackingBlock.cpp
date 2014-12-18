@@ -25,11 +25,31 @@ Tracking::Tracking(_2Real::bundle::BlockIo const& io,
 		std::vector<std::shared_ptr<_2Real::bundle::Block>> const& dependencies) :
 		_2Real::bundle::Block(io, dependencies)
 {
-			if (m_oscListener->hasNewData())
+		if (m_oscListener->hasNewData())
+		{
+			HumanListener::Data data = m_oscListener->nextData();
+
+			auto outItem = boost::get<_2Real::CustomDataItem>(mIo.mOutlets[0]->getValue());
+
+			outItem.getValue<uint32_t>("id") = data.id;
+
+			if (m_frameNumbers.find(data.id) == m_frameNumbers.end())
 			{
-				HumanListener::Data data = m_oscListener->nextData();
-				
-			}			
+				m_frameNumbers[data.id] = 0;
+			}
+
+			m_frameNumbers[data.id]++;
+
+			outItem.getValue<uint64_t>("frame") = m_frameNumbers[data.id];
+
+			auto pos = outItem.getValue<_2Real::CustomDataItem>("pos");
+			pos.getValue<double>("x") = data.px;
+			pos.getValue<double>("y") = data.pz;
+
+			outItem.getValue<double>("rot") = data.midshoulder_roll;
+			outItem.getValue<double>("facerot") = data.frz;
+			outItem.getValue<uint8_t>("engaged") = data.engaged;
+		}			
 }
 
 

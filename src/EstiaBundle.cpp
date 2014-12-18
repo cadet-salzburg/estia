@@ -35,6 +35,11 @@ void getBundleMetainfo(_2Real::bundle::BundleMetainfo &info)
 		_2Real::declareField("attentionLtf", "uchar")
 	});
 
+	info.exportsType("humanLabel", {
+		_2Real::declareField("id", "uint"),
+		_2Real::declareField("labelStf", "uchar")
+	});
+
 	info.exportsType("modellingConfig", {
 		_2Real::declareField("mode", "uchar"),
 		_2Real::declareField("datafile", "string")
@@ -45,13 +50,25 @@ void getBundleMetainfo(_2Real::bundle::BundleMetainfo &info)
 	});
 
 	info.exportsBlock("attentionModelling", 
-	{ _2Real::declareInlet("humans") },
-	{ _2Real::declareOutlet("attentives") },
-	{ _2Real::declareParameter("config") }
+		{
+			_2Real::declareInlet("humans"),
+			_2Real::declareInlet("labels") 
+		},
+		{ 
+			_2Real::declareOutlet("attentives") 
+		},
+		{ 
+			_2Real::declareParameter("config") 
+		}
 	);
 
 	info.exportsBlock("attentionTracking",
-	{ },
-	{ _2Real::declareOutlet("humans")},
-	{ _2Real::declareParameter("config")});
+		{ },
+		{ 
+			_2Real::declareOutlet("humans") 
+		},
+		{ 
+			_2Real::declareParameter("config") 
+		}
+	);
 }

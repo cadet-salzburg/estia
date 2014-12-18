@@ -61,6 +61,7 @@ public:
 	uint8_t predict(const Human::Pattern &pattern, AttentionType type);
 
 	Predictions updateWithFrame(const Human::HumanFrame &humanFrame);
+	bool setLabelStf(uint32_t id, uint8_t labelStf);
 	void updateFixed(float dt);
 
 	ApplicationMode applicationMode() const { return m_applicationMode; }

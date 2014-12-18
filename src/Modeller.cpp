@@ -237,6 +237,19 @@ void Modeller::savePatterns()
 	svmdata.close();
 }
 
+bool Modeller::setLabelStf(uint32_t id, uint8_t labelStf)
+{
+	std::lock_guard<std::mutex> lock(m_humansMutex);
+
+	if (m_humans.find(id) == m_humans.end())
+	{
+		return false;
+	}
+
+	m_humans[id]->setLabel(labelStf);
+	return true;
+}
+
 Modeller::Predictions Modeller::updateWithFrame(const Human::HumanFrame &humanFrame)
 {
 	std::lock_guard<std::mutex> lock(m_humansMutex);
@@ -247,7 +260,12 @@ Modeller::Predictions Modeller::updateWithFrame(const Human::HumanFrame &humanFr
 	}
 
 	auto human = m_humans[humanFrame.id];
-	human->update(humanFrame.pos, humanFrame.rot, humanFrame.facerot, humanFrame.engaged);
+
+	if (human->mostRecentFrame() < humanFrame.frame)
+	{
+		human->update(humanFrame.pos, humanFrame.rot, humanFrame.facerot, humanFrame.engaged);
+		human->setMostRecentFrame(humanFrame.frame);
+	}
 
 	Predictions predictions;
 

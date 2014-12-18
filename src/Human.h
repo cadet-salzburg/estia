@@ -57,8 +57,12 @@ public:
 	void setPredictionStf(uint8_t i) { m_predictionStf = i; }
 	void setPredictionLtf(uint8_t i) { m_predictionLtf = i; }
 
+	uint64_t mostRecentFrame() const { return m_mostRecentFrame; }
+	void setMostRecentFrame(uint64_t f) { m_mostRecentFrame = f; }
+
 private:
 	uint32_t m_id;
+	uint64_t m_mostRecentFrame;
 	Eigen::Vector2d m_pos;
 	Eigen::Vector2d m_initialPos;
 	Eigen::Vector2d m_velVec;
