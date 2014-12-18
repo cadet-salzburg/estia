@@ -40,9 +40,18 @@ void getBundleMetainfo(_2Real::bundle::BundleMetainfo &info)
 		_2Real::declareField("datafile", "string")
 	});
 
-	info.exportsBlock("attentionEstimator", 
+	info.exportsType("trackingConfig", {
+		_2Real::declareField("oscPort", "uint")
+	});
+
+	info.exportsBlock("attentionModelling", 
 	{ _2Real::declareInlet("humans") },
 	{ _2Real::declareOutlet("attentives") },
 	{ _2Real::declareParameter("config") }
 	);
+
+	info.exportsBlock("attentionTracking",
+	{ },
+	{ _2Real::declareOutlet("humans")},
+	{ _2Real::declareParameter("config")});
 }

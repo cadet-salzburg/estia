@@ -42,7 +42,7 @@ Modelling::~Modelling()
 void Modelling::setup()
 {
 	auto configParam = mIo.mParameters[0];
-	auto config = boost::get<_2Real::CustomDataItem>((configParam->getValue()));
+	auto config = boost::get<_2Real::CustomDataItem>(configParam->getValue());
 	auto mode = static_cast<Modeller::ApplicationMode>(config.getValue<uint8_t>("mode"));
 	auto datafile = config.getValue<std::string>("datafile");
 
