@@ -50,9 +50,10 @@ public:
 		LtfClass ltf;
 	};
 
-	Modeller();
+	Modeller(ApplicationMode mode);
 	~Modeller();
 
+	void initCollection();
 	void trainSvm();
 	void savePatterns();
 	void readProblem(const std::string &filenameStr, svm_problem &prob, svm_parameter &param,
@@ -63,6 +64,8 @@ public:
 	void updateFixed(float dt);
 
 	ApplicationMode applicationMode() const { return m_applicationMode; }
+
+	void setFilenameBase(const std::string &f) { m_filenameBase = f; }
 
 private:
 	std::list<Human::Pattern> m_patternsStf, m_patternsLtf;

@@ -37,10 +37,19 @@ void exit_input_error(int line_num)
 	exit(1);
 }
 
-Modeller::Modeller() : 
+Modeller::Modeller(ApplicationMode mode) : 
 	m_modelStf(nullptr),
-	m_modelLtf(nullptr)
+	m_modelLtf(nullptr),
+	m_applicationMode(mode)
 {
+	if (mode == ApplicationMode::PREDICT)
+	{
+		trainSvm();
+	}
+	else
+	{
+		initCollection();
+	}
 }
 
 
@@ -193,7 +202,7 @@ uint8_t Modeller::predict(const Human::Pattern &pattern, Modeller::AttentionType
 	return 0;
 }
 
-void Modeller::savePatterns()
+void Modeller::initCollection()
 {
 #pragma warning(push)
 #pragma warning(disable: 4996)
@@ -202,9 +211,15 @@ void Modeller::savePatterns()
 	auto now_c = std::chrono::system_clock::to_time_t(now);
 	std::stringstream filename;
 	filename << "data/" << std::put_time(std::localtime(&now_c), "%F_%H-%M-%S") << "_stf.txt";
+	m_filenameBase = filename.str();
+#pragma warning(pop)
+}
+
+void Modeller::savePatterns()
+{
 
 	std::ofstream svmdata;
-	svmdata.open(filename.str());
+	svmdata.open(m_filenameBase);
 
 	for (const Human::Pattern &pattern : m_patternsStf)
 	{
@@ -220,12 +235,12 @@ void Modeller::savePatterns()
 	}
 
 	svmdata.close();
-
-#pragma warning(pop)
 }
 
 Modeller::Predictions Modeller::updateWithFrame(const Human::HumanFrame &humanFrame)
 {
+	std::lock_guard<std::mutex> lock(m_humansMutex);
+
 	if (m_humans.find(humanFrame.id) == m_humans.end())
 	{
 		m_humans[humanFrame.id] = std::make_shared<Human>(humanFrame.id);

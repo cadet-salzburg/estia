@@ -41,7 +41,16 @@ Modelling::~Modelling()
 
 void Modelling::setup()
 {
+	auto configParam = mIo.mParameters[0];
+	auto config = boost::get<_2Real::CustomDataItem>((configParam->getValue()));
+	auto mode = static_cast<Modeller::ApplicationMode>(config.getValue<uint8_t>("mode"));
+	auto datafile = config.getValue<std::string>("datafile");
 
+	m_modeller = std::make_shared<Modeller>(mode);
+	if (mode == Modeller::ApplicationMode::PREDICT)
+	{
+		m_modeller->setFilenameBase(datafile);
+	}
 }
 
 void Modelling::update()
@@ -54,7 +63,7 @@ void Modelling::update()
 	Human::HumanFrame humanFrame;
 
 	humanFrame.frame = val_in.getValue<uint64_t>("frame");
-	humanFrame.id = val_in.getValue<uint64_t>("id");
+	humanFrame.id = val_in.getValue<uint32_t>("id");
 	auto pos = val_in.getValue<_2Real::CustomDataItem>("pos");
 	humanFrame.pos = Eigen::Vector2d(
 		pos.getValue<double>("x"),

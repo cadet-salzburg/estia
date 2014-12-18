@@ -35,9 +35,14 @@ void getBundleMetainfo(_2Real::bundle::BundleMetainfo &info)
 		_2Real::declareField("attentionLtf", "uchar")
 	});
 
+	info.exportsType("modellingConfig", {
+		_2Real::declareField("mode", "uchar"),
+		_2Real::declareField("datafile", "string")
+	});
+
 	info.exportsBlock("attentionEstimator", 
 	{ _2Real::declareInlet("humans") },
 	{ _2Real::declareOutlet("attentives") },
-	{ _2Real::declareParameter("init") }
+	{ _2Real::declareParameter("config") }
 	);
 }
