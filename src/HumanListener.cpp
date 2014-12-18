@@ -4,15 +4,6 @@
 
 #include <Eigen/Core>
 
-HumanListener::HumanListener()
-{
-}
-
-
-HumanListener::~HumanListener()
-{
-}
-
 void HumanListener::ProcessMessage(const osc::ReceivedMessage &m,
 	const IpEndpointName &remoteEndpoint)
 {
@@ -37,8 +28,8 @@ void HumanListener::ProcessMessage(const osc::ReceivedMessage &m,
 	}
 	catch (osc::Exception &e)
 	{
-		std::cerr << "error parsing argument: " << m.AddressPattern << ": "
-			<< e.what << std::endl;
+		std::cerr << "error parsing argument: " << m.AddressPattern() << ": "
+			<< e.what() << std::endl;
 	}
 }
 

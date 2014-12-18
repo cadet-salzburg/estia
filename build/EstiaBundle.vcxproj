@@ -12,24 +12,48 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\lib\libsvm\svm.cpp" />
+    <ClCompile Include="..\lib\oscpack_1_1_0\ip\IpEndpointName.cpp" />
+    <ClCompile Include="..\lib\oscpack_1_1_0\ip\win32\NetworkingUtils.cpp" />
+    <ClCompile Include="..\lib\oscpack_1_1_0\ip\win32\UdpSocket.cpp" />
+    <ClCompile Include="..\lib\oscpack_1_1_0\osc\OscOutboundPacketStream.cpp" />
+    <ClCompile Include="..\lib\oscpack_1_1_0\osc\OscPrintReceivedElements.cpp" />
+    <ClCompile Include="..\lib\oscpack_1_1_0\osc\OscReceivedElements.cpp" />
+    <ClCompile Include="..\lib\oscpack_1_1_0\osc\OscTypes.cpp" />
     <ClCompile Include="..\src\Feature.cpp" />
     <ClCompile Include="..\src\Human.cpp" />
     <ClCompile Include="..\src\EstiaBundle.cpp" />
+    <ClCompile Include="..\src\HumanListener.cpp" />
     <ClCompile Include="..\src\Modeller.cpp" />
     <ClCompile Include="..\src\ModellingBlock.cpp" />
+    <ClCompile Include="..\src\TrackingBlock.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\lib\libsvm\svm.h" />
+    <ClInclude Include="..\lib\oscpack_1_1_0\ip\IpEndpointName.h" />
+    <ClInclude Include="..\lib\oscpack_1_1_0\ip\NetworkingUtils.h" />
+    <ClInclude Include="..\lib\oscpack_1_1_0\ip\PacketListener.h" />
+    <ClInclude Include="..\lib\oscpack_1_1_0\ip\TimerListener.h" />
+    <ClInclude Include="..\lib\oscpack_1_1_0\ip\UdpSocket.h" />
+    <ClInclude Include="..\lib\oscpack_1_1_0\osc\MessageMappingOscPacketListener.h" />
+    <ClInclude Include="..\lib\oscpack_1_1_0\osc\OscException.h" />
+    <ClInclude Include="..\lib\oscpack_1_1_0\osc\OscHostEndianness.h" />
+    <ClInclude Include="..\lib\oscpack_1_1_0\osc\OscOutboundPacketStream.h" />
+    <ClInclude Include="..\lib\oscpack_1_1_0\osc\OscPacketListener.h" />
+    <ClInclude Include="..\lib\oscpack_1_1_0\osc\OscPrintReceivedElements.h" />
+    <ClInclude Include="..\lib\oscpack_1_1_0\osc\OscReceivedElements.h" />
+    <ClInclude Include="..\lib\oscpack_1_1_0\osc\OscTypes.h" />
     <ClInclude Include="..\src\Feature.h" />
     <ClInclude Include="..\src\Human.h" />
+    <ClInclude Include="..\src\HumanListener.h" />
     <ClInclude Include="..\src\Modeller.h" />
     <ClInclude Include="..\src\ModellingBlock.h" />
+    <ClInclude Include="..\src\TrackingBlock.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9715AAC5-CDCD-4DD6-AF27-97E45B5547C0}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>PythiaBundle</RootNamespace>
-    <ProjectName>EstiaBundle</ProjectName>
+    <ProjectName>Bundle_Estia</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -68,16 +92,19 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;PYTHIABUNDLE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;PYTHIABUNDLE_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\lib\;..\lib\libsvm;$(BOOST_DIR);$(_2REAL_FRAMEWORK_DIR)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\lib\;..\lib\oscpack_1_1_0;..\lib\libsvm;$(BOOST_DIR);$(_2REAL_FRAMEWORK_DIR)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(BOOST_DIR)\lib\win32;$(BOOST_DIR)\stage\lib;$(_2REAL_FRAMEWORK_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>_2RealFramework_32d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>_2RealFramework_32d.lib;ws2_32.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy $(SolutionDir)$(Configuration)\Bundle*.dll $(_2REAL_BUNDLE_DIR)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

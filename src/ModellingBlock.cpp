@@ -86,7 +86,10 @@ void Modelling::update()
 
 	if (m_modeller->applicationMode() == Modeller::ApplicationMode::COLLECT)
 	{
-		
+		auto id = label_in.getValue<uint32_t>("id");
+		auto label = label_in.getValue<uint8_t>("labelStf");
+
+		m_modeller->setLabelStf(id, label);
 	}
 }
 

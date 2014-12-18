@@ -1,8 +1,10 @@
-// PythiaBundle.cpp : Defines the exported functions for the DLL application.
-//
+
 
 #include "_2RealBundle.h"
 #include <Eigen/Core>
+
+#include "ModellingBlock.h"
+#include "TrackingBlock.h"
 
 void getBundleMetainfo(_2Real::bundle::BundleMetainfo &info)
 {
@@ -71,4 +73,66 @@ void getBundleMetainfo(_2Real::bundle::BundleMetainfo &info)
 			_2Real::declareParameter("config") 
 		}
 	);
+}
+
+void getTypeMetainfo(_2Real::bundle::CustomTypeMetainfo &info,
+	_2Real::bundle::TypeMetainfoCollection const& existingTypes)
+{
+	if (info.getName() == "vec2")
+	{
+		info.setDescription("vec2, double");
+		info.setInitialFieldValue("x", 0.0);
+		info.setInitialFieldValue("y", 0.0);
+	}
+	else if (info.getName() == "human")
+	{
+		auto vec2Info = std::static_pointer_cast<const _2Real::bundle::CustomTypeMetainfo>
+			(existingTypes.getTypeMetainfo("vec2"));
+
+		info.setInitialFieldValue("frame", (uint64_t) 0);
+		info.setInitialFieldValue("id", (uint32_t) 0);
+		info.setInitialFieldValue("pos", vec2Info->makeData());
+		info.setInitialFieldValue("rot", 0.0);
+		info.setInitialFieldValue("facerot", 0.0);
+		info.setInitialFieldValue("engaged", (uint8_t) 0);
+	}
+	else if (info.getName() == "attentive")
+	{
+		auto vec2Info = std::static_pointer_cast<const _2Real::bundle::CustomTypeMetainfo>
+			(existingTypes.getTypeMetainfo("vec2"));
+
+		info.setInitialFieldValue("id", (uint32_t)0);
+		info.setInitialFieldValue("pos", vec2Info->makeData());
+		info.setInitialFieldValue("attentionStf", (uint8_t)0);
+		info.setInitialFieldValue("attentionLtf", (uint8_t)0);
+	}
+	else if (info.getName() == "humanLabel")
+	{
+		info.setInitialFieldValue("id", (uint32_t)0);
+		info.setInitialFieldValue("labelStf", (uint8_t)0);
+	}
+	else if (info.getName() == "modellingConfig")
+	{
+		info.setInitialFieldValue("mode", (uint8_t)0);
+		info.setInitialFieldValue("datafile", std::string("none"));
+	}
+	else if (info.getName() == "trackingConfig")
+	{
+		info.setInitialFieldValue("oscPort", (uint32_t) 57120);
+	}
+
+}
+
+void getBlockMetainfo(_2Real::bundle::BlockMetainfo &info,
+	_2Real::bundle::TypeMetainfoCollection const& types)
+{
+	if (info.getName() == "attentionModelling")
+	{
+		Modelling::getBlockMetaInfo(info, types);
+	}
+	else if (info.getName() == "attentionTracking")
+	{
+		Tracking::getBlockMetaInfo(info, types);
+	}
+
 }
