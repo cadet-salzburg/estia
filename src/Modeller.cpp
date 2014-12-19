@@ -7,6 +7,7 @@
 #include <sstream>
 #include <iomanip>
 #include <thread>
+#include <iostream>
 
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
