@@ -40,7 +40,9 @@ void exit_input_error(int line_num)
 Modeller::Modeller(ApplicationMode mode) : 
 	m_modelStf(nullptr),
 	m_modelLtf(nullptr),
-	m_applicationMode(mode)
+	m_applicationMode(mode),
+	m_doFixedUpdate(true),
+	m_lastUpdate(0.0)
 {
 	if (mode == ApplicationMode::PREDICT)
 	{
@@ -55,6 +57,9 @@ Modeller::Modeller(ApplicationMode mode) :
 
 Modeller::~Modeller()
 {
+	m_doFixedUpdate = false;
+
+	m_fixedThread->join();
 }
 
 void Modeller::readProblem(const std::string &filenameStr,
@@ -237,7 +242,7 @@ void Modeller::savePatterns()
 	svmdata.close();
 }
 
-bool Modeller::setLabelStf(uint32_t id, uint8_t labelStf)
+bool Modeller::setLabelStf(uint64_t id, uint8_t labelStf)
 {
 	std::lock_guard<std::mutex> lock(m_humansMutex);
 
@@ -279,11 +284,22 @@ Modeller::Predictions Modeller::updateWithFrame(const Human::HumanFrame &humanFr
 	return predictions;
 }
 
+void Modeller::fixedLoop()
+{
+	m_fixedThread = std::shared_ptr<std::thread>(new std::thread([this](){
+		while (m_doFixedUpdate)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+			updateFixed(0.05f);
+		}
+	}));
+}
+
 void Modeller::updateFixed(float dt)
 {
 	std::lock_guard<std::mutex> lock(m_humansMutex);
 
-	std::list<uint32_t> toDelete;
+	std::list<uint64_t> toDelete;
 
 	for (auto &kv : m_humans)
 	{

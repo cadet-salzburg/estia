@@ -26,14 +26,14 @@ public:
 	struct HumanFrame
 	{
 		uint64_t frame;
-		uint32_t id;
+		uint64_t id;
 		Eigen::Vector2d pos;
 		double rot;
 		double facerot;
 		uint8_t engaged;
 	};
 
-	Human(uint32_t id);
+	Human(uint64_t id);
 	~Human();
 
 	void setup();
@@ -49,7 +49,7 @@ public:
 	float lifetime() const { return m_lifetime; }
 	void setTimeSinceLastUpdate(float f) { m_timeSinceLastUpdate = f; }
 	float timeSinceLastUpdate() const { return m_timeSinceLastUpdate; }
-	uint32_t id() const { return m_id; }
+	uint64_t id() const { return m_id; }
 
 	uint8_t predictionStf() const { return m_predictionStf; }
 	uint8_t predictionLtf() const { return m_predictionLtf; }
@@ -61,7 +61,7 @@ public:
 	void setMostRecentFrame(uint64_t f) { m_mostRecentFrame = f; }
 
 private:
-	uint32_t m_id;
+	uint64_t m_id;
 	uint64_t m_mostRecentFrame;
 	Eigen::Vector2d m_pos;
 	Eigen::Vector2d m_initialPos;

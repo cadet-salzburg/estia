@@ -7,7 +7,7 @@
 
 using namespace Eigen;
 
-Human::Human(uint32_t id) : 
+Human::Human(uint64_t id) : 
 	m_id(id),
 	m_initialPosIsSet(false),
 	m_lifetime(.0f),

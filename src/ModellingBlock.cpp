@@ -51,6 +51,7 @@ void Modelling::setup()
 	{
 		m_modeller->setFilenameBase(datafile);
 	}
+
 }
 
 void Modelling::update()
@@ -66,7 +67,10 @@ void Modelling::update()
 	Human::HumanFrame humanFrame;
 
 	humanFrame.frame = val_in.getValue<uint64_t>("frame");
-	humanFrame.id = val_in.getValue<uint32_t>("id");
+
+	auto gid = val_in.getValue<_2Real::CustomDataItem>("id");
+	auto unique_id = gid.getValue<_2Real::CustomDataItem>("id").getValue<uint64_t>("unique_id");
+	humanFrame.id = unique_id;
 	auto pos = val_in.getValue<_2Real::CustomDataItem>("pos");
 	humanFrame.pos = Eigen::Vector2d(
 		pos.getValue<double>("x"),
@@ -78,7 +82,7 @@ void Modelling::update()
 	Modeller::Predictions predictions = m_modeller->updateWithFrame(humanFrame);
 
 	_2Real::CustomDataItem &val_out = boost::get<_2Real::CustomDataItem>(outlet->getValue());
-	val_out.getValue<uint32_t>("id") = humanFrame.id;
+	val_out.getValue<_2Real::CustomDataItem>("id") = gid;
 	val_out.getValue<_2Real::CustomDataItem>("pos") = pos;
 	val_out.getValue<uint8_t>("attentionStf") = static_cast<uint8_t>(predictions.stf);
 	val_out.getValue<uint8_t>("attentionLtf") = static_cast<uint8_t>(predictions.ltf);
@@ -86,7 +90,10 @@ void Modelling::update()
 
 	if (m_modeller->applicationMode() == Modeller::ApplicationMode::COLLECT)
 	{
-		auto id = label_in.getValue<uint32_t>("id");
+		auto id = label_in
+			.getValue<_2Real::CustomDataItem>("id")
+			.getValue<_2Real::CustomDataItem>("id")
+			.getValue<uint64_t>("unique_id");
 		auto label = label_in.getValue<uint8_t>("labelStf");
 
 		m_modeller->setLabelStf(id, label);

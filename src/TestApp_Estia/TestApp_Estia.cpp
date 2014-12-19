@@ -66,18 +66,12 @@ void handleFuture( std::future< _2Real::BlockResult > &obj, std::string const& i
 	}
 }
 
-int main( int argc, char *argv[] )
+void infos(std::pair<_2Real::app::BundleHandle, _2Real::app::BundleMetainfo> const& loadedBundle)
 {
-	try
-	{
-		_2Real::app::Engine testEngine;
+	auto bundleinfo = loadedBundle.second;
 
-		auto loadedBundle = testEngine.loadBundle("Bundle_Estia");
-
-		auto bundleinfo = loadedBundle.second;
-
-		std::cout << "basic bundle info" << std::endl;
-		std::cout << "description " << bundleinfo.getDescription() << std::endl;
+	std::cout << "basic bundle info" << std::endl;
+	std::cout << "description " << bundleinfo.getDescription() << std::endl;
 		std::cout << "category " << bundleinfo.getCategory() << std::endl;
 		std::cout << "author " << bundleinfo.getAuthor() << std::endl;
 		std::cout << "contact " << bundleinfo.getContact() << std::endl;
@@ -149,23 +143,72 @@ int main( int argc, char *argv[] )
 				std::cout << std::endl;
 			}
 		}
+}
+
+int main( int argc, char *argv[] )
+{
+	try
+	{
+		_2Real::app::Engine testEngine;
+
+		auto idBundle = testEngine.loadBundle("Bundle_Identification");
+
+		infos(idBundle);
+
+		auto loadedBundle = testEngine.loadBundle("Bundle_Estia");
+
+		infos(loadedBundle);
+
 
 		// -------create block instance---------
 
-		_2Real::app::TimerHandle timer = testEngine.createTimer( 5.0 );
+		_2Real::app::TimerHandle timer = testEngine.createTimer( 30.0 );
 		_2Real::app::ThreadpoolHandle threadpool = 
 			testEngine.createThreadpool( _2Real::ThreadpoolPolicy::FIFO );
+
+
 		_2Real::app::BlockHandle blockModelling = 
 			loadedBundle.first.createBlock("attentionModelling", 
 			threadpool, 
 			std::vector< _2Real::app::BlockHandle >());
 
-		_2Real::app::BlockIo io = blockModelling.getBlockIo();
-		auto incInlet = std::dynamic_pointer_cast< _2Real::app::InletHandle >
-			(io.mInlets[0]);
+		_2Real::app::BlockIo mio = blockModelling.getBlockIo();
+		auto inletModellingHumans = std::dynamic_pointer_cast< _2Real::app::InletHandle >
+			(mio.mInlets[0]);
+		auto inletModellingLabels = std::dynamic_pointer_cast<_2Real::app::InletHandle>
+			(mio.mInlets[1]);
+		auto outletModellingAttentives = std::dynamic_pointer_cast<_2Real::app::OutletHandle>
+			(mio.mOutlets[0]);
 
-		std::future< _2Real::BlockResult > setup = blockModelling.setup();
-		handleFuture( setup );
+		_2Real::app::BlockHandle blockTracking = 
+			loadedBundle.first.createBlock("attentionTracking", 
+			threadpool, 
+			std::vector< _2Real::app::BlockHandle >());
+
+		_2Real::app::BlockIo tio = blockTracking.getBlockIo();
+		auto outletTrackingHumans = std::dynamic_pointer_cast< _2Real::app::OutletHandle >
+			(tio.mOutlets[0]);
+
+
+		std::future< _2Real::BlockResult > setupM = blockModelling.setup();
+		handleFuture( setupM );
+
+		std::future< _2Real::BlockResult > setupT = blockTracking.setup();
+		handleFuture( setupT );
+
+		auto link = testEngine.link(*inletModellingHumans, *outletTrackingHumans);
+
+		blockModelling.getUpdatePolicy().set(_2Real::DefaultUpdatePolicy::ANY);
+
+		outletModellingAttentives->registerToNewData([](std::shared_ptr<const _2Real::DataItem> d)
+		{
+			std::cout << "NEW VALUE ";
+			d->apply_visitor<_2Real::PrintOutVisitor>(_2Real::PrintOutVisitor(std::cout));
+			std::cout << std::endl;
+		});
+
+		blockTracking.startUpdating(timer);
+		blockModelling.startUpdating();
 
 	}
 	catch ( std::exception const& e )

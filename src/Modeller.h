@@ -1,6 +1,8 @@
 #pragma once
 #include <list>
 #include <mutex>
+#include <atomic>
+#include <thread>
 
 #include "Human.h"
 
@@ -61,22 +63,25 @@ public:
 	uint8_t predict(const Human::Pattern &pattern, AttentionType type);
 
 	Predictions updateWithFrame(const Human::HumanFrame &humanFrame);
-	bool setLabelStf(uint32_t id, uint8_t labelStf);
+	bool setLabelStf(uint64_t id, uint8_t labelStf);
 	void updateFixed(float dt);
 
 	ApplicationMode applicationMode() const { return m_applicationMode; }
 
 	void setFilenameBase(const std::string &f) { m_filenameBase = f; }
+	void fixedLoop();
 
 private:
 	std::list<Human::Pattern> m_patternsStf, m_patternsLtf;
-	std::map<uint32_t, std::shared_ptr<Human>> m_humans;
+	std::map<uint64_t, std::shared_ptr<Human>> m_humans;
 	std::string m_filenameBase;
 	svm_model *m_modelStf;
 	svm_model *m_modelLtf;
 	std::mutex m_humansMutex;
 
 	ApplicationMode m_applicationMode;
-	
+	std::shared_ptr<std::thread> m_fixedThread;
+	std::atomic<bool> m_doFixedUpdate;
+	double m_lastUpdate;
 };
 

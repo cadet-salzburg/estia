@@ -25,31 +25,6 @@ Tracking::Tracking(_2Real::bundle::BlockIo const& io,
 		std::vector<std::shared_ptr<_2Real::bundle::Block>> const& dependencies) :
 		_2Real::bundle::Block(io, dependencies)
 {
-		if (m_oscListener->hasNewData())
-		{
-			HumanListener::Data data = m_oscListener->nextData();
-
-			auto outItem = boost::get<_2Real::CustomDataItem>(mIo.mOutlets[0]->getValue());
-
-			outItem.getValue<uint32_t>("id") = data.id;
-
-			if (m_frameNumbers.find(data.id) == m_frameNumbers.end())
-			{
-				m_frameNumbers[data.id] = 0;
-			}
-
-			m_frameNumbers[data.id]++;
-
-			outItem.getValue<uint64_t>("frame") = m_frameNumbers[data.id];
-
-			auto pos = outItem.getValue<_2Real::CustomDataItem>("pos");
-			pos.getValue<double>("x") = data.px;
-			pos.getValue<double>("y") = data.pz;
-
-			outItem.getValue<double>("rot") = data.midshoulder_roll;
-			outItem.getValue<double>("facerot") = data.frz;
-			outItem.getValue<uint8_t>("engaged") = data.engaged;
-		}			
 }
 
 
@@ -71,7 +46,34 @@ void Tracking::setup()
 
 void Tracking::update()
 {
+	if (m_oscListener->hasNewData())
+	{
+		HumanListener::Data data = m_oscListener->nextData();
+		
+		auto outItem = boost::get<_2Real::CustomDataItem>(mIo.mOutlets[0]->getValue());
 
+		auto gidOut = outItem.getValue<_2Real::CustomDataItem>("id");
+		auto idOut = gidOut.getValue<_2Real::CustomDataItem>("id");
+		idOut.getValue<uint64_t>("unique_id") = data.id;
+		gidOut.getValue<std::string>("identificator") = "k4w2streamer01";
+		
+		if (m_frameNumbers.find(data.id) == m_frameNumbers.end())
+		{
+			m_frameNumbers[data.id] = 0;
+		}
+
+		m_frameNumbers[data.id]++;
+		
+		outItem.getValue<uint64_t>("frame") = m_frameNumbers[data.id];
+		
+		auto pos = outItem.getValue<_2Real::CustomDataItem>("pos");
+		pos.getValue<double>("x") = data.px;
+		pos.getValue<double>("y") = data.pz;
+		
+		outItem.getValue<double>("rot") = data.midshoulder_roll;
+		outItem.getValue<double>("facerot") = data.frz;
+		outItem.getValue<uint8_t>("engaged") = data.engaged;
+	}
 }
 
 void Tracking::shutdown()
