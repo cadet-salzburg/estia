@@ -211,11 +211,23 @@ void Modeller::initCollection()
 {
 #pragma warning(push)
 #pragma warning(disable: 4996)
+	/*
+	time_t rawtime;
+	struct tm * timeinfo;
+	char buffer[80];
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	strftime(buffer, 80, "%F_%H-%M-%S", timeinfo);
+*/
 
 	auto now = std::chrono::system_clock::now();
 	auto now_c = std::chrono::system_clock::to_time_t(now);
 	std::stringstream filename;
-	filename << "data/" << std::put_time(std::localtime(&now_c), "%F_%H-%M-%S") << "_stf.txt";
+//	filename << "./";
+	auto obj = std::put_time(std::localtime(&now_c), "%F_%H-%M-%S");
+	filename << "data/" << "0" << "_stf.txt";
 	m_filenameBase = filename.str();
 #pragma warning(pop)
 }

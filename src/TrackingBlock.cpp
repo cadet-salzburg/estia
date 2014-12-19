@@ -11,6 +11,9 @@ void Tracking::getBlockMetaInfo(_2Real::bundle::BlockMetainfo &info,
 	auto humanInfo = std::static_pointer_cast<const _2Real::bundle::CustomTypeMetainfo>
 		(types.getTypeMetainfo("human"));
 
+	auto configInfo = std::static_pointer_cast<const _2Real::bundle::CustomTypeMetainfo>
+		(types.getTypeMetainfo("trackingConfig"));
+
 	trackingInfo.setBlockClass<Tracking>();
 	trackingInfo.setDescription("tracking");
 
@@ -19,6 +22,10 @@ void Tracking::getBlockMetaInfo(_2Real::bundle::BlockMetainfo &info,
 
 	_2Real::bundle::OutletMetainfo out = trackingInfo.getOutletMetainfo("humans");
 	out.setDescription("humans coming out");
+	out.setDatatypeAndInitialValue(humanInfo->makeData());
+
+	_2Real::bundle::ParameterMetainfo config = trackingInfo.getParameterMetainfo("config");
+	config.setDatatypeAndInitialValue(configInfo->makeData());
 }
 
 Tracking::Tracking(_2Real::bundle::BlockIo const& io,
@@ -42,12 +49,20 @@ void Tracking::setup()
 	m_oscListener = std::shared_ptr<HumanListener>(new HumanListener());
 	m_udpSocket = std::shared_ptr<UdpListeningReceiveSocket>(
 		new UdpListeningReceiveSocket(localEndpoint, m_oscListener.get()));
+	std::thread t(&UdpListeningReceiveSocket::Run, m_udpSocket);
+	t.detach();
+
+
+	std::cout << "tracking set up" << std::endl;
 }
 
 void Tracking::update()
 {
+//	std::cout << "TRACKING UPD " << std::endl;
+
 	if (m_oscListener->hasNewData())
 	{
+		std::cout << "NEW DATA " << std::endl;
 		HumanListener::Data data = m_oscListener->nextData();
 		
 		auto outItem = boost::get<_2Real::CustomDataItem>(mIo.mOutlets[0]->getValue());
@@ -73,6 +88,10 @@ void Tracking::update()
 		outItem.getValue<double>("rot") = data.midshoulder_roll;
 		outItem.getValue<double>("facerot") = data.frz;
 		outItem.getValue<uint8_t>("engaged") = data.engaged;
+	}
+	else
+	{
+		mIo.mOutlets[0]->discard();
 	}
 }
 

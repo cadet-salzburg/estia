@@ -189,6 +189,12 @@ int main( int argc, char *argv[] )
 		auto outletTrackingHumans = std::dynamic_pointer_cast< _2Real::app::OutletHandle >
 			(tio.mOutlets[0]);
 
+		auto cfg = std::shared_ptr<_2Real::DataItem>(new _2Real::DataItem());
+		*cfg = loadedBundle.second.getExportedType("trackingConfig").makeData();
+		auto param = tio.mParameters[0];
+		param->setValue(cfg);
+
+
 
 		std::future< _2Real::BlockResult > setupM = blockModelling.setup();
 		handleFuture( setupM );
@@ -207,8 +213,30 @@ int main( int argc, char *argv[] )
 			std::cout << std::endl;
 		});
 
-		blockTracking.startUpdating(timer);
-		blockModelling.startUpdating();
+		auto s1 = blockTracking.startUpdating(timer);
+		auto s2 = blockModelling.startUpdating();
+
+		handleFuture(s1);
+		handleFuture(s2);
+		
+		while (1)
+		{
+			std::this_thread::yield();
+
+			std::string line;
+			char lineEnd = '\n';
+			std::getline( std::cin, line, lineEnd );
+			if ( line == "q" )
+				break;
+			else if ( line == "stop" )
+			{
+				timer.stop();
+			}
+			else if ( line == "start" )
+			{
+				timer.start();
+			}
+		}
 
 	}
 	catch ( std::exception const& e )

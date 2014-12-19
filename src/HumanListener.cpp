@@ -11,6 +11,8 @@ void HumanListener::ProcessMessage(const osc::ReceivedMessage &m,
 	
 	try
 	{
+		std::cout << m.AddressPattern() << std::endl;
+
 		if (std::strcmp(m.AddressPattern(), "/body") == 0)
 		{
 			osc::ReceivedMessageArgumentStream args = m.ArgumentStream();
@@ -22,6 +24,8 @@ void HumanListener::ProcessMessage(const osc::ReceivedMessage &m,
 				>> d.base_roll >> d.midspline_roll >> d.midshoulder_roll >> d.neck_roll
 				>> d.px >> d.py >> d.pz >> d.frx >> d.fry >> d.frz
 				>> d.engaged;
+
+			std::cout << d.id << " / " << d.px << " / " << d.pz << std::endl;
 
 			m_dataQueue.push(d);
 		}

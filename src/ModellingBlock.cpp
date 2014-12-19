@@ -16,6 +16,9 @@ void Modelling::getBlockMetaInfo(_2Real::bundle::BlockMetainfo &info,
 	auto attentiveInfo = std::static_pointer_cast<const _2Real::bundle::CustomTypeMetainfo>
 		(types.getTypeMetainfo("attentive"));
 
+	auto configInfo = std::static_pointer_cast<const _2Real::bundle::CustomTypeMetainfo>
+		(types.getTypeMetainfo("modellingConfig"));
+
 	modellingInfo.setBlockClass<Modelling>();
 	modellingInfo.setDescription("modelling");
 
@@ -24,9 +27,14 @@ void Modelling::getBlockMetaInfo(_2Real::bundle::BlockMetainfo &info,
 
 	_2Real::bundle::InletMetainfo in = modellingInfo.getInletMetainfo("humans");
 	in.setDescription("humans coming in");
+	in.setDatatypeAndInitialValue(humanInfo->makeData());
 
 	_2Real::bundle::OutletMetainfo out = modellingInfo.getOutletMetainfo("attentives");
 	out.setDescription("attentives coming out");
+	out.setDatatypeAndInitialValue(attentiveInfo->makeData());
+
+	_2Real::bundle::ParameterMetainfo param = modellingInfo.getParameterMetainfo("config");
+	param.setDatatypeAndInitialValue(configInfo->makeData());
 }
 
 Modelling::Modelling(_2Real::bundle::BlockIo const& io,
@@ -56,6 +64,8 @@ void Modelling::setup()
 
 void Modelling::update()
 {
+	std::cout << "MODELLING UPD " << std::endl;
+
 	auto inlet = std::dynamic_pointer_cast<_2Real::bundle::InletHandle>(mIo.mInlets[0]);
 	auto labelsInlet = std::dynamic_pointer_cast<_2Real::bundle::InletHandle>(mIo.mInlets[1]);
 	auto outlet = mIo.mOutlets[0];
