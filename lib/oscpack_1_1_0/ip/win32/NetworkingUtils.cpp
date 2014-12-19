@@ -36,11 +36,12 @@
 */
 #include "ip/NetworkingUtils.h"
 
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+
 #include <winsock2.h>   // this must come first to prevent errors with MSVC7
 #include <windows.h>
 
 #include <cstring>
-
 
 static LONG initCount_ = 0;
 static bool winsockInitialized_ = false;

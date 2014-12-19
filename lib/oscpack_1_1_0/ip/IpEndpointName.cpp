@@ -34,12 +34,14 @@
 	requested that these non-binding requests be included whenever the
 	above license is reproduced.
 */
+
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "IpEndpointName.h"
 
 #include <cstdio>
 
 #include "NetworkingUtils.h"
-
 
 unsigned long IpEndpointName::GetHostByName( const char *s )
 {
