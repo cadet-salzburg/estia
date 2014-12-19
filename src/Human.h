@@ -9,6 +9,9 @@
 
 #include <boost/variant.hpp>
 
+#define EIGEN_DONT_VECTORIZE
+#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
+
 #define DISAPPEAR_AFTER 2.0f
 
 class Feature;
@@ -63,9 +66,9 @@ public:
 private:
 	uint64_t m_id;
 	uint64_t m_mostRecentFrame;
-	Eigen::Vector2d m_pos;
-	Eigen::Vector2d m_initialPos;
-	Eigen::Vector2d m_velVec;
+	Eigen::Matrix<double,2,1,Eigen::DontAlign> m_pos;
+	Eigen::Matrix<double,2,1,Eigen::DontAlign> m_initialPos;
+	Eigen::Matrix<double,2,1,Eigen::DontAlign> m_velVec;
 	float m_lifetime;
 	float m_timeSinceLastUpdate;
 
@@ -79,5 +82,8 @@ private:
 	uint8_t m_currentLabel;
 
 	uint8_t m_predictionStf, m_predictionLtf;
+
+public:
+//	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 

@@ -34,7 +34,10 @@
 	requested that these non-binding requests be included whenever the
 	above license is reproduced.
 */
+
+#ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
+#endif
 
 #include "OscPrintReceivedElements.h"
 

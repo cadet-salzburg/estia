@@ -194,7 +194,9 @@ int main( int argc, char *argv[] )
 		auto param = tio.mParameters[0];
 		param->setValue(cfg);
 
-
+		auto label = std::shared_ptr<_2Real::DataItem>(new _2Real::DataItem());
+		*label = loadedBundle.second.getExportedType("humanLabel").makeData();
+		inletModellingLabels->setValue(label);
 
 		std::future< _2Real::BlockResult > setupM = blockModelling.setup();
 		handleFuture( setupM );
@@ -202,7 +204,7 @@ int main( int argc, char *argv[] )
 		std::future< _2Real::BlockResult > setupT = blockTracking.setup();
 		handleFuture( setupT );
 
-		auto link = testEngine.link(*inletModellingHumans, *outletTrackingHumans);
+		auto link = testEngine.link(*inletModellingHumans.get(), *outletTrackingHumans.get());
 
 		blockModelling.getUpdatePolicy().set(_2Real::DefaultUpdatePolicy::ANY);
 
@@ -211,7 +213,19 @@ int main( int argc, char *argv[] )
 			std::cout << "NEW VALUE ";
 			d->apply_visitor<_2Real::PrintOutVisitor>(_2Real::PrintOutVisitor(std::cout));
 			std::cout << std::endl;
+
+			std::cout << "attn " 
+				<< (uint32_t) boost::get<_2Real::CustomDataItem>(*d).getValue<uint8_t>("attentionStf") 
+				<< std::endl;
 		});
+		
+		//outletTrackingHumans->registerToNewData([](std::shared_ptr<const _2Real::DataItem> d)
+		//{
+		//	std::cout << "NEW HUMAN ";
+		//	d->apply_visitor<_2Real::PrintOutVisitor>(_2Real::PrintOutVisitor(std::cout));
+		//	std::cout << std::endl;
+		//});
+		//
 
 		auto s1 = blockTracking.startUpdating(timer);
 		auto s2 = blockModelling.startUpdating();
@@ -238,6 +252,18 @@ int main( int argc, char *argv[] )
 			}
 		}
 
+		auto stop = blockTracking.stopUpdating();
+		handleFuture(stop);
+		auto stop2 = blockModelling.stopUpdating();
+		handleFuture(stop2);
+
+		auto shut = blockTracking.shutdown();
+		handleFuture(shut);
+		auto shut2 = blockModelling.shutdown();
+		handleFuture(shut2);
+
+		testEngine.clear();
+
 	}
 	catch ( std::exception const& e )
 	{
@@ -255,7 +281,7 @@ int main( int argc, char *argv[] )
 		std::getline( std::cin, line, lineEnd );
 		if ( line == "q" )
 			break;
-	}
+	}	
 
 	return 0;
 }

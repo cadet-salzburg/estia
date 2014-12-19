@@ -15,6 +15,8 @@ void Modelling::getBlockMetaInfo(_2Real::bundle::BlockMetainfo &info,
 		(types.getTypeMetainfo("human"));
 	auto attentiveInfo = std::static_pointer_cast<const _2Real::bundle::CustomTypeMetainfo>
 		(types.getTypeMetainfo("attentive"));
+	auto labelInfo = std::static_pointer_cast<const _2Real::bundle::CustomTypeMetainfo>
+		(types.getTypeMetainfo("humanLabel"));
 
 	auto configInfo = std::static_pointer_cast<const _2Real::bundle::CustomTypeMetainfo>
 		(types.getTypeMetainfo("modellingConfig"));
@@ -28,6 +30,10 @@ void Modelling::getBlockMetaInfo(_2Real::bundle::BlockMetainfo &info,
 	_2Real::bundle::InletMetainfo in = modellingInfo.getInletMetainfo("humans");
 	in.setDescription("humans coming in");
 	in.setDatatypeAndInitialValue(humanInfo->makeData());
+
+	_2Real::bundle::InletMetainfo inLabel = modellingInfo.getInletMetainfo("labels");
+	inLabel.setDescription("labels coming in");
+	inLabel.setDatatypeAndInitialValue(labelInfo->makeData());
 
 	_2Real::bundle::OutletMetainfo out = modellingInfo.getOutletMetainfo("attentives");
 	out.setDescription("attentives coming out");
@@ -60,6 +66,8 @@ void Modelling::setup()
 		m_modeller->setFilenameBase(datafile);
 	}
 
+	m_modeller->fixedLoop();
+
 }
 
 void Modelling::update()
@@ -85,6 +93,12 @@ void Modelling::update()
 	humanFrame.pos = Eigen::Vector2d(
 		pos.getValue<double>("x"),
 		pos.getValue<double>("y"));
+
+	std::cout << "mod/val-in: " << val_in << std::endl;
+
+	std::cout << "mod/in: " << pos.getValue<double>("x") << " / " << pos.getValue<double>("x")
+			<< std::endl;
+
 	humanFrame.rot = val_in.getValue<double>("rot");
 	humanFrame.facerot = val_in.getValue<double>("facerot");
 	humanFrame.engaged = val_in.getValue<uint8_t>("engaged");
@@ -96,6 +110,7 @@ void Modelling::update()
 	val_out.getValue<_2Real::CustomDataItem>("pos") = pos;
 	val_out.getValue<uint8_t>("attentionStf") = static_cast<uint8_t>(predictions.stf);
 	val_out.getValue<uint8_t>("attentionLtf") = static_cast<uint8_t>(predictions.ltf);
+
 
 
 	if (m_modeller->applicationMode() == Modeller::ApplicationMode::COLLECT)
@@ -112,5 +127,5 @@ void Modelling::update()
 
 void Modelling::shutdown()
 {
-
+	m_modeller->savePatterns();
 }

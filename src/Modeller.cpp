@@ -59,7 +59,7 @@ Modeller::~Modeller()
 {
 	m_doFixedUpdate = false;
 
-	m_fixedThread->join();
+//	m_fixedThread->join();
 }
 
 void Modeller::readProblem(const std::string &filenameStr,
@@ -305,6 +305,8 @@ void Modeller::fixedLoop()
 			updateFixed(0.05f);
 		}
 	}));
+
+	m_fixedThread->detach();
 }
 
 void Modeller::updateFixed(float dt)
@@ -318,6 +320,8 @@ void Modeller::updateFixed(float dt)
 		auto human = kv.second;
 		human->setLifetime(human->lifetime() + dt);
 		human->setTimeSinceLastUpdate(human->timeSinceLastUpdate() + dt);
+//		std::cout << "human over: " << human->timeSinceLastUpdate()
+//			<< " / " << DISAPPEAR_AFTER << std::endl;
 		if (human->timeSinceLastUpdate() > DISAPPEAR_AFTER)
 		{
 			toDelete.push_back(human->id());
@@ -330,6 +334,7 @@ void Modeller::updateFixed(float dt)
 
 		if (applicationMode() == ApplicationMode::COLLECT)
 		{
+			std::cout << "SAVING HUMAN" << std::endl;
 			auto human = humanIt->second;
 			auto stfPatterns = human->labelledStfPatterns();
 			m_patternsStf.insert(m_patternsStf.end(), stfPatterns.begin(), stfPatterns.end());

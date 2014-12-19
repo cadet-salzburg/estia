@@ -11,8 +11,18 @@ Human::Human(uint64_t id) :
 	m_id(id),
 	m_initialPosIsSet(false),
 	m_lifetime(.0f),
-	m_timeSinceLastUpdate(.0f)
+	m_timeSinceLastUpdate(.0f),
+	m_mostRecentFrame(0),
+	m_totalDistanceTravelled(0.0),
+	m_currentLabel(0),
+	m_predictionLtf(0),
+	m_predictionStf(0)
+
+///	m_pos(Eigen::Vector2d(0.0, 0.0)),
+///	m_initialPos(Eigen::Vector2d(0.0, 0.0)),
+///	m_velVec(Eigen::Vector2d(0.0, 0.0))
 {
+	setup();
 }
 
 
@@ -123,7 +133,7 @@ std::list< Human::Pattern > Human::labelledStfPatterns() const
 	{
 		Pattern pattern;
 
-		for (auto paramList : featureParams)
+		for (auto &paramList : featureParams)
 		{
 			if (paramList.empty())
 			{
