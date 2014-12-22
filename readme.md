@@ -2,7 +2,7 @@
 
 #### user attention estimation bundle for the _2RealFramework
 
-*estia* (greek for "focus") receives input from a Kinectv2 stream via OSC and estimates any number of visible person's attention levels, encoded in two variables, the *short term factor* (STF) and the *long term factor* (LTF).
+*estia* (greek for "focus") receives input from a Kinectv2 stream via OSC and estimates any number of visible persons' attention levels, encoded in two variables, the *short time frame* (STF) and the *long time frame* (LTF).
 
 ## System
 
