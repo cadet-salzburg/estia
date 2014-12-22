@@ -112,7 +112,7 @@ For each feature, mean and standard deviation is used, i.e. 16 features in total
 For STF, the last 3 frames are used for calculation, and there is one pattern per frame. 
 For LTF, all frames are used for calculation, and there is one pattern per subject.
 
-Note that in the SVM data files, the features are sorted alphabetically by name (due to `std::map behaviour`), i.e. index 1 is `accel_mag` mean, index 2 is `accel_mag` stddev, index 3 is `directness` mean etc.
+Note that in the SVM data files, the features are sorted alphabetically by name (due to `std::map` behaviour), i.e. index 1 is `accel_mag` mean, index 2 is `accel_mag` stddev, index 3 is `directness` mean etc.
 
 ### Libraries used
 
