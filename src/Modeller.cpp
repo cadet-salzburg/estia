@@ -7,6 +7,7 @@
 #include <sstream>
 #include <iomanip>
 #include <thread>
+#include <iostream>
 
 #include <windows.h>
 #define SYSERROR()  GetLastError()
