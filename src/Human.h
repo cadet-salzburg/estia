@@ -47,6 +47,7 @@ public:
 
 	std::list< Pattern > labelledStfPatterns() const;
 	Pattern currentStfPattern() const;
+	Pattern currentLtfPattern() const;
 
 	Pattern labelledLtfPattern(uint8_t label) const;
 

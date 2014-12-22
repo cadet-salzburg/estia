@@ -258,9 +258,9 @@ uint8_t Modeller::predict(const Human::Pattern &pattern, Modeller::AttentionType
 		}
 		node[idx].index = -1;
 
-		double stfPrediction = svm_predict(model, node);
+		double prediction = svm_predict(model, node);
 
-		return static_cast<uint8_t>(stfPrediction);
+		return static_cast<uint8_t>(prediction);
 	}
 	return 0;
 }
@@ -394,6 +394,11 @@ Modeller::Predictions Modeller::updateWithFrame(const Human::HumanFrame &humanFr
 		uint8_t predictionStf = predict(human->currentStfPattern(), AttentionType::STF);	
 		human->setPredictionStf(predictionStf);
 		predictions.stf = static_cast<StfClass>(predictionStf);
+
+		uint8_t predictionLtf = predict(human->currentLtfPattern(), AttentionType::LTF);
+		human->setPredictionLtf(predictionLtf);
+		predictions.ltf = static_cast<LtfClass>(predictionLtf);
+
 	}
 
 	return predictions;

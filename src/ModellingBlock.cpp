@@ -105,7 +105,8 @@ void Modelling::update()
 	humanFrame.engaged = val_in.getValue<uint8_t>("engaged");
 
 	Modeller::Predictions predictions = m_modeller->updateWithFrame(humanFrame);
-	std::cout << "PREDICTION: " << (uint32_t)predictions.stf << std::endl;
+	std::cout << "PREDICTION: " << (uint32_t)predictions.stf << " / " << 
+		(uint32_t)predictions.ltf << std::endl;
 
 	_2Real::CustomDataItem &val_out = boost::get<_2Real::CustomDataItem>(outlet->getValue());
 	val_out.getValue<_2Real::CustomDataItem>("id") = gid;

@@ -129,6 +129,21 @@ Human::Pattern Human::currentStfPattern() const
 	return pattern;
 }
 
+Human::Pattern Human::currentLtfPattern() const
+{
+	Pattern pattern;
+
+	for (auto &featureTuple : m_features)
+	{
+		auto key = featureTuple.first;
+		auto feature = featureTuple.second;	
+		pattern.features.push_back(feature->ltfMean());
+		pattern.features.push_back(feature->ltfStd());
+	}
+
+	return pattern;
+}
+
 Human::Pattern Human::labelledLtfPattern(uint8_t label) const
 {
 
