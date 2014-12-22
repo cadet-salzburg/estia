@@ -17,7 +17,7 @@ It is conceived to be used with a single depth camera and an application streami
 It features two main modes of operation:
 
 - **COLLECT** (mode 0): In this mode, a human operator should supply STF and LTF class labels for all subjects as they are tracked by the system. The results will be saved in data files.
-- **PREDICT** (mode 1): This mode is used for estimating attention based on the data gathered in **COLLECT** mode. At startup, the SVMs are trained with data from files saved in **COLLECT** mode. Then, every frame, STF and LTF predictions are made for each subject, and provided via a block outlet.
+- **PREDICT** (mode 1): This mode is used for estimating attention based on the data gathered in *COLLECT* mode. At startup, the SVMs are trained with data from files saved in *COLLECT* mode. Then, every frame, STF and LTF predictions are made for each subject, and provided via a block outlet.
 
 ## Quick Start
 
@@ -92,7 +92,7 @@ In both modes, its only outlet provides `attentive`s, but only in *PREDICT* mode
 
 In both cases, an integer value of 0 denotes no class, and should not be used as a label.
 
-All labelled feature data is stored in the `data/` subfolder, using the naming scheme `YYYY-mm-dd_HH-MM-SS_(ltf|stf)`.
+All labelled feature data is stored in the `data/` subfolder, using the naming scheme `YYYY-mm-dd_HH-MM-SS_(ltf|stf).txt`.
 
 ## Internals
 
