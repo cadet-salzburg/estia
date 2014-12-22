@@ -198,7 +198,7 @@ int main( int argc, char *argv[] )
 		*mcfg = loadedBundle.second.getExportedType("modellingConfig").makeData();
 		auto mcfgR = boost::get<_2Real::CustomDataItem>(*mcfg);
 		mcfgR.getValue<uint8_t>("mode") = 1;
-		mcfgR.getValue<std::string>("datafile") = "data/2014-12-22_11-31-58";
+		mcfgR.getValue<std::string>("datafile") = "data/2014-12-22_13-19-26";
 		auto modelParam = mio.mParameters[0];
 		*mcfg = mcfgR;
 		modelParam->setValue(mcfg);

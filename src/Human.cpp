@@ -62,9 +62,10 @@ void Human::update(const Eigen::Vector2d &pos, double rot, double facerot, int e
 
 	Vector2d velVec = pos - m_pos;
 	double velMag = velVec.norm();
-	m_features["vel_mag"]->updateWithValue(velMag);
 
 	double accelMag = velMag - m_features["vel_mag"]->value();
+
+	m_features["vel_mag"]->updateWithValue(velMag);
 	m_features["accel_mag"]->updateWithValue(accelMag);
 
 	{
@@ -123,6 +124,21 @@ Human::Pattern Human::currentStfPattern() const
 		auto feature = featureTuple.second;		
 		pattern.features.push_back(feature->stfMeans().back());
 		pattern.features.push_back(feature->stfStds().back());
+	}
+
+	return pattern;
+}
+
+Human::Pattern Human::labelledLtfPattern(uint8_t label) const
+{
+
+	Pattern pattern;
+	pattern.label = label;
+
+	for (auto &featureTuple : m_features)
+	{
+		pattern.features.push_back(featureTuple.second->ltfMean());
+		pattern.features.push_back(featureTuple.second->ltfStd());
 	}
 
 	return pattern;

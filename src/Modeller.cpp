@@ -187,28 +187,60 @@ void Modeller::trainSvm()
 	std::stringstream filenameStf;
 	filenameStf << m_filenameBase << "_stf.txt";
 
-	svm_node *xspaceStf = nullptr;
-	svm_problem probStf;
-	svm_parameter paramStf;
+	std::stringstream filenameLtf;
+	filenameLtf << m_filenameBase << "_ltf.txt";
 
-	paramStf.svm_type = C_SVC;
-	paramStf.kernel_type = RBF;
-	paramStf.degree = 3;
-	paramStf.gamma = 1.0f / 16.0f;
-	paramStf.coef0 = 0;
-	paramStf.nu = 0.5;
-	paramStf.cache_size = 100;
-	paramStf.C = 1;
-	paramStf.eps = 1e-3;
-	paramStf.p = 0.1;
-	paramStf.shrinking = 1;
-	paramStf.probability = 0;
-	paramStf.nr_weight = 0;
-	paramStf.weight_label = NULL;
-	paramStf.weight = NULL;
+	{
+		svm_node *xspaceStf = nullptr;
+		svm_problem probStf;
+		svm_parameter paramStf;
 
-	readProblem(filenameStf.str(), probStf, paramStf, xspaceStf);
-	m_modelStf = svm_train(&probStf, &paramStf);
+		paramStf.svm_type = C_SVC;
+		paramStf.kernel_type = RBF;
+		paramStf.degree = 3;
+		paramStf.gamma = 1.0f / 16.0f;
+		paramStf.coef0 = 0;
+		paramStf.nu = 0.5;
+		paramStf.cache_size = 100;
+		paramStf.C = 1;
+		paramStf.eps = 1e-3;
+		paramStf.p = 0.1;
+		paramStf.shrinking = 1;
+		paramStf.probability = 0;
+		paramStf.nr_weight = 0;
+		paramStf.weight_label = NULL;
+		paramStf.weight = NULL;
+
+		readProblem(filenameStf.str(), probStf, paramStf, xspaceStf);
+		m_modelStf = svm_train(&probStf, &paramStf);
+	}
+
+	{
+		svm_node *xspaceLtf = nullptr;
+		svm_problem probLtf;
+		svm_parameter paramLtf;
+
+		paramLtf.svm_type = C_SVC;
+		paramLtf.kernel_type = RBF;
+		paramLtf.degree = 3;
+		paramLtf.gamma = 1.0f / 16.0f;
+		paramLtf.coef0 = 0;
+		paramLtf.nu = 0.5;
+		paramLtf.cache_size = 100;
+		paramLtf.C = 1;
+		paramLtf.eps = 1e-3;
+		paramLtf.p = 0.1;
+		paramLtf.shrinking = 1;
+		paramLtf.probability = 0;
+		paramLtf.nr_weight = 0;
+		paramLtf.weight_label = NULL;
+		paramLtf.weight = NULL;
+
+		readProblem(filenameLtf.str(), probLtf, paramLtf, xspaceLtf);
+		m_modelLtf = svm_train(&probLtf, &paramLtf);
+	}
+
+	
 }
 
 uint8_t Modeller::predict(const Human::Pattern &pattern, Modeller::AttentionType type)
@@ -250,44 +282,78 @@ void Modeller::initCollection()
 
 	auto now = std::chrono::system_clock::now();
 	auto now_c = std::chrono::system_clock::to_time_t(now);
-	std::stringstream filename;
+	std::stringstream filename, filenameLtf;
 //	filename << "./";
 	auto obj = std::put_time(std::localtime(&now_c), "%Y-%m-%d_%H-%M-%S");
 	filename << "data/" << obj << "_stf.txt";
-	m_filenameBase = filename.str();
+	filenameLtf << "data/" << obj << "_ltf.txt";
+	m_filenameStf = filename.str();
+	m_filenameLtf = filenameLtf.str();
 #pragma warning(pop)
 }
 
 void Modeller::savePatterns()
 {
+	// STF
+	{ 
+		std::ofstream svmdata(m_filenameStf);
 
-	std::ofstream svmdata(m_filenameBase);
-
-	if (svmdata.is_open())
-	{
-		for (const Human::Pattern &pattern : m_patternsStf)
+		if (svmdata.is_open())
 		{
-			svmdata << pattern.label;
-
-			int idx = 1;
-			for (double val : pattern.features)
+			for (const Human::Pattern &pattern : m_patternsStf)
 			{
-				if (std::isnan(val) || std::isinf(val))
-					val = 0.0;
-				svmdata << " " << idx << ":" << val;
-				idx++;
+				svmdata << pattern.label;
+
+				int idx = 1;
+				for (double val : pattern.features)
+				{
+					if (std::isnan(val) || std::isinf(val))
+						val = 0.0;
+					svmdata << " " << idx << ":" << val;
+					idx++;
+				}
+
+				svmdata << std::endl;
 			}
 
-			svmdata << std::endl;
+			svmdata.close();
 		}
+		else
+		{
+			std::cerr << "failed to open file: " << SYSERROR() << std::endl;
+		}
+	}
 
-		svmdata.close();
+	// LTF
+	{ 	
+
+		std::ofstream svmdata(m_filenameLtf);
+
+		if (svmdata.is_open())
+		{
+			for (const Human::Pattern &pattern : m_patternsLtf)
+			{
+				svmdata << pattern.label;
+
+				int idx = 1;
+				for (double val : pattern.features)
+				{
+					if (std::isnan(val) || std::isinf(val))
+						val = 0.0;
+					svmdata << " " << idx << ":" << val;
+					idx++;
+				}
+
+				svmdata << std::endl;
+			}
+
+			svmdata.close();
+		}
+		else
+		{
+			std::cerr << "failed to open file: " << SYSERROR() << std::endl;
+		}
 	}
-	else
-	{
-		std::cerr << "failed to open file: " << SYSERROR() << std::endl;
-	}
-	
 
 }
 
@@ -375,6 +441,8 @@ void Modeller::updateFixed(float dt)
 			auto human = humanIt->second;
 			auto stfPatterns = human->labelledStfPatterns();
 			m_patternsStf.insert(m_patternsStf.end(), stfPatterns.begin(), stfPatterns.end());
+
+			m_patternsLtf.push_back(human->labelledLtfPattern(0));
 		}
 
 		m_humans.erase(humanIt);

@@ -74,7 +74,7 @@ public:
 private:
 	std::list<Human::Pattern> m_patternsStf, m_patternsLtf;
 	std::map<uint64_t, std::shared_ptr<Human>> m_humans;
-	std::string m_filenameBase;
+	std::string m_filenameBase, m_filenameStf, m_filenameLtf;
 	svm_model *m_modelStf;
 	svm_model *m_modelLtf;
 	std::mutex m_humansMutex;

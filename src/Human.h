@@ -48,6 +48,8 @@ public:
 	std::list< Pattern > labelledStfPatterns() const;
 	Pattern currentStfPattern() const;
 
+	Pattern labelledLtfPattern(uint8_t label) const;
+
 	void setLifetime(float f) { m_lifetime = f; }
 	float lifetime() const { return m_lifetime; }
 	void setTimeSinceLastUpdate(float f) { m_timeSinceLastUpdate = f; }
@@ -79,7 +81,7 @@ private:
 
 	std::map<std::string, std::shared_ptr<Feature> > m_features;
 	std::deque<int> m_labels;
-	uint8_t m_currentLabel;
+	uint8_t m_currentLabel;	
 
 	uint8_t m_predictionStf, m_predictionLtf;
 
