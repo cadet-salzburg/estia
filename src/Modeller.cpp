@@ -8,6 +8,9 @@
 #include <iomanip>
 #include <thread>
 
+#include <windows.h>
+#define SYSERROR()  GetLastError()
+
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
 static char *line = NULL;
@@ -58,6 +61,8 @@ Modeller::Modeller(ApplicationMode mode) :
 Modeller::~Modeller()
 {
 	m_doFixedUpdate = false;
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
 //	m_fixedThread->join();
 }
@@ -226,8 +231,8 @@ void Modeller::initCollection()
 	auto now_c = std::chrono::system_clock::to_time_t(now);
 	std::stringstream filename;
 //	filename << "./";
-	auto obj = std::put_time(std::localtime(&now_c), "%F_%H-%M-%S");
-	filename << "data/" << "0" << "_stf.txt";
+	auto obj = std::put_time(std::localtime(&now_c), "%Y-%m-%d_%H-%M-%S");
+	filename << "data/" << obj << "_stf.txt";
 	m_filenameBase = filename.str();
 #pragma warning(pop)
 }
@@ -235,23 +240,31 @@ void Modeller::initCollection()
 void Modeller::savePatterns()
 {
 
-	std::ofstream svmdata;
-	svmdata.open(m_filenameBase);
+	std::ofstream svmdata(m_filenameBase);
 
-	for (const Human::Pattern &pattern : m_patternsStf)
+	if (svmdata.is_open())
 	{
-		svmdata << pattern.label;
-
-		int idx = 1;
-		for (double val : pattern.features)
+		for (const Human::Pattern &pattern : m_patternsStf)
 		{
-			svmdata << " " << idx << ":" << val;
+			svmdata << pattern.label;
+
+			int idx = 1;
+			for (double val : pattern.features)
+			{
+				svmdata << " " << idx << ":" << val;
+			}
+
+			svmdata << std::endl;
 		}
 
-		svmdata << std::endl;
+		svmdata.close();
 	}
+	else
+	{
+		std::cerr << "failed to open file: " << SYSERROR() << std::endl;
+	}
+	
 
-	svmdata.close();
 }
 
 bool Modeller::setLabelStf(uint64_t id, uint8_t labelStf)
@@ -299,7 +312,7 @@ Modeller::Predictions Modeller::updateWithFrame(const Human::HumanFrame &humanFr
 void Modeller::fixedLoop()
 {
 	m_fixedThread = std::shared_ptr<std::thread>(new std::thread([this](){
-		while (m_doFixedUpdate)
+		while (this && m_doFixedUpdate)
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 			updateFixed(0.05f);
