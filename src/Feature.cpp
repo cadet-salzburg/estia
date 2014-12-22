@@ -40,6 +40,9 @@ void Feature::pushValue(double value)
 
 void Feature::updateWithValue(double value, bool computeStats, int numFrames)
 {
+	if (std::isnan(value) || std::isinf(value))
+		value = 0.0;
+
 	pushValue(value);
 	if (computeStats)
 	{

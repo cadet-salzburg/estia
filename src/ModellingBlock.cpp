@@ -64,6 +64,7 @@ void Modelling::setup()
 	if (mode == Modeller::ApplicationMode::PREDICT)
 	{
 		m_modeller->setFilenameBase(datafile);
+		m_modeller->trainSvm();
 	}
 
 	m_modeller->fixedLoop();
@@ -72,7 +73,7 @@ void Modelling::setup()
 
 void Modelling::update()
 {
-	std::cout << "MODELLING UPD " << std::endl;
+//	std::cout << "MODELLING UPD " << std::endl;
 
 	auto inlet = std::dynamic_pointer_cast<_2Real::bundle::InletHandle>(mIo.mInlets[0]);
 	auto labelsInlet = std::dynamic_pointer_cast<_2Real::bundle::InletHandle>(mIo.mInlets[1]);
@@ -94,16 +95,17 @@ void Modelling::update()
 		pos.getValue<double>("x"),
 		pos.getValue<double>("y"));
 
-	std::cout << "mod/val-in: " << val_in << std::endl;
+//	std::cout << "mod/val-in: " << val_in << std::endl;
 
-	std::cout << "mod/in: " << pos.getValue<double>("x") << " / " << pos.getValue<double>("x")
-			<< std::endl;
+//	std::cout << "mod/in: " << pos.getValue<double>("x") << " / " << pos.getValue<double>("x")
+//			<< std::endl;
 
 	humanFrame.rot = val_in.getValue<double>("rot");
 	humanFrame.facerot = val_in.getValue<double>("facerot");
 	humanFrame.engaged = val_in.getValue<uint8_t>("engaged");
 
 	Modeller::Predictions predictions = m_modeller->updateWithFrame(humanFrame);
+	std::cout << "PREDICTION: " << (uint32_t)predictions.stf << std::endl;
 
 	_2Real::CustomDataItem &val_out = boost::get<_2Real::CustomDataItem>(outlet->getValue());
 	val_out.getValue<_2Real::CustomDataItem>("id") = gid;

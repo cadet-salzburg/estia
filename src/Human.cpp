@@ -53,7 +53,7 @@ void Human::update(const Eigen::Vector2d &pos, double rot, double facerot, int e
 {
 	if (!m_initialPosIsSet)
 	{
-		m_initialPos = pos;
+		m_initialPos = m_pos = pos;
 		m_totalDistanceTravelled = 0.0;
 		m_initialPosIsSet = true;
 	}
@@ -70,22 +70,42 @@ void Human::update(const Eigen::Vector2d &pos, double rot, double facerot, int e
 	{
 		double totalPosDiff = (pos - m_initialPos).norm();
 		m_totalDistanceTravelled += velMag;
-		double directness = totalPosDiff / m_totalDistanceTravelled;
-		m_features["directness"]->updateWithValue(directness);
+		if (m_totalDistanceTravelled != 0.0)
+		{
+			double directness = totalPosDiff / m_totalDistanceTravelled;
+			if (std::isnan(directness) || std::isinf(directness))
+				directness = 0.0;
+			m_features["directness"]->updateWithValue(directness);
+		}
+		else
+		{
+			m_features["directness"]->updateWithValue(0.0);
+		}
 	}
+
 
 	double distanceToCam = pos.norm();
 	m_features["distance"]->updateWithValue(distanceToCam);
 
 	double phi = std::acos(velVec.dot(pos) / (velMag * distanceToCam));
+	if (std::isnan(phi) || std::isinf(phi))
+		phi = 0.0;
 	m_features["phi"]->updateWithValue(phi);
 
 	m_features["facerot"]->updateWithValue(facerot);
 	m_features["engaged"]->updateWithValue(engaged);
 
 	m_labels.push_front(m_currentLabel);
+
+	std::cout << "/human" << std::endl;
+	for (auto &kv : m_features)
+	{
+		std::cout << kv.first << "\t" << kv.second->value() << std::endl;
+	}
 	
 	setTimeSinceLastUpdate(.0f);
+
+	m_pos = pos;
 }
 
 void Human::setLabel(uint8_t label)

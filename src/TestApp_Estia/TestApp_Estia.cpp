@@ -194,6 +194,15 @@ int main( int argc, char *argv[] )
 		auto param = tio.mParameters[0];
 		param->setValue(cfg);
 
+		auto mcfg = std::shared_ptr<_2Real::DataItem>(new _2Real::DataItem());
+		*mcfg = loadedBundle.second.getExportedType("modellingConfig").makeData();
+		auto mcfgR = boost::get<_2Real::CustomDataItem>(*mcfg);
+		mcfgR.getValue<uint8_t>("mode") = 1;
+		mcfgR.getValue<std::string>("datafile") = "data/2014-12-22_11-31-58";
+		auto modelParam = mio.mParameters[0];
+		*mcfg = mcfgR;
+		modelParam->setValue(mcfg);
+
 		auto label = std::shared_ptr<_2Real::DataItem>(new _2Real::DataItem());
 		*label = loadedBundle.second.getExportedType("humanLabel").makeData();
 		inletModellingLabels->setValue(label);

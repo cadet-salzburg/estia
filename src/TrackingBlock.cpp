@@ -62,10 +62,10 @@ void Tracking::update()
 
 	if (m_oscListener->hasNewData())
 	{
-		std::cout << "NEW DATA " << std::endl;
+	//	std::cout << "NEW DATA " << std::endl;
 		HumanListener::Data data = m_oscListener->nextData();
 
-		std::cout << "ID " << data.id << std::endl;
+//		std::cout << "ID " << data.id << std::endl;
 		
 		_2Real::DataItem &outlval = mIo.mOutlets[0]->getValue();
 		_2Real::CustomDataItem &outItem = boost::get<_2Real::CustomDataItem>(outlval);
@@ -97,12 +97,12 @@ void Tracking::update()
 		outItem.getValue<double>("facerot") = data.frz;
 		outItem.getValue<uint8_t>("engaged") = data.engaged;
 
-		std::cout << "gid " << gidOut << std::endl;
-		std::cout << "id " << idOut << std::endl;
+//		std::cout << "gid " << gidOut << std::endl;
+//		std::cout << "id " << idOut << std::endl;
 
 
-		std::cout << "tack/out:" << std::endl;
-		std::cout << outItem << std::endl;
+//		std::cout << "tack/out:" << std::endl;
+//		std::cout << outItem << std::endl;
 
 		
 		//{

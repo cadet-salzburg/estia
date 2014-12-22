@@ -9,6 +9,8 @@
 #include <locale.h>
 #include "svm.h"
 
+#include <cmath>
+
 #pragma warning(push)
 #pragma warning(disable: 4996)
 
@@ -331,6 +333,14 @@ double Kernel::k_function(const svm_node *x, const svm_node *y,
 			double sum = 0;
 			while(x->index != -1 && y->index !=-1)
 			{
+				if (std::isnan(x->value) || std::isnan(y->value)
+					|| std::isinf(x->value) || std::isinf(y->value)
+					|| std::isnan(sum) || std::isinf(sum))
+				{
+					if (std::isnan(sum) || std::isinf(sum))
+						sum = 0.0;
+				}
+
 				if(x->index == y->index)
 				{
 					double d = x->value - y->value;
@@ -355,6 +365,10 @@ double Kernel::k_function(const svm_node *x, const svm_node *y,
 
 			while(x->index != -1)
 			{
+				if (std::isnan(x->value) || std::isinf(x->value))
+				{
+					printf("error");
+				}
 				sum += x->value * x->value;
 				++x;
 			}

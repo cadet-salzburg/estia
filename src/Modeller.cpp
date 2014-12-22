@@ -50,7 +50,7 @@ Modeller::Modeller(ApplicationMode mode) :
 {
 	if (mode == ApplicationMode::PREDICT)
 	{
-		trainSvm();
+
 	}
 	else
 	{
@@ -82,6 +82,8 @@ void Modeller::readProblem(const std::string &filenameStr,
 	char *endptr;
 	char *idx, *val, *label;
 
+	std::cerr << "READ PROB ERROR: " << SYSERROR() << std::endl;
+
 	if(fp == NULL)
 	{
 		fprintf(stderr,"can't open input file %s\n",filename);
@@ -91,8 +93,8 @@ void Modeller::readProblem(const std::string &filenameStr,
 	prob.l = 0;
 	elements = 0;
 
-	int max_line_len = 1024;
-	char *line = Malloc(char,max_line_len);
+	max_line_len = 1024;
+	line = Malloc(char,max_line_len);
 	while(readline(fp)!=NULL)
 	{
 		char *p = strtok(line," \t"); // label
@@ -189,6 +191,22 @@ void Modeller::trainSvm()
 	svm_problem probStf;
 	svm_parameter paramStf;
 
+	paramStf.svm_type = C_SVC;
+	paramStf.kernel_type = RBF;
+	paramStf.degree = 3;
+	paramStf.gamma = 1.0f / 16.0f;
+	paramStf.coef0 = 0;
+	paramStf.nu = 0.5;
+	paramStf.cache_size = 100;
+	paramStf.C = 1;
+	paramStf.eps = 1e-3;
+	paramStf.p = 0.1;
+	paramStf.shrinking = 1;
+	paramStf.probability = 0;
+	paramStf.nr_weight = 0;
+	paramStf.weight_label = NULL;
+	paramStf.weight = NULL;
+
 	readProblem(filenameStf.str(), probStf, paramStf, xspaceStf);
 	m_modelStf = svm_train(&probStf, &paramStf);
 }
@@ -199,15 +217,17 @@ uint8_t Modeller::predict(const Human::Pattern &pattern, Modeller::AttentionType
 
 	if (model != nullptr)
 	{
-		svm_node *node = new svm_node[pattern.features.size()];
+		svm_node *node = new svm_node[pattern.features.size() + 1];
 		int idx = 0;
 		for (double val : pattern.features)
 		{
 			node[idx].value = val;
 			node[idx].index = idx++;
 		}
+		node[idx].index = -1;
 
 		double stfPrediction = svm_predict(model, node);
+
 		return static_cast<uint8_t>(stfPrediction);
 	}
 	return 0;
@@ -252,7 +272,10 @@ void Modeller::savePatterns()
 			int idx = 1;
 			for (double val : pattern.features)
 			{
+				if (std::isnan(val) || std::isinf(val))
+					val = 0.0;
 				svmdata << " " << idx << ":" << val;
+				idx++;
 			}
 
 			svmdata << std::endl;
