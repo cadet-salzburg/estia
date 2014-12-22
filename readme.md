@@ -118,10 +118,15 @@ Note that in the SVM data files, the features are sorted alphabetically by name 
 
 - [libSVM][]
 - [oscPack][]
+- [Eigen][]
+
+All three are redistributed in source form.
 
 [libSVM]: http://www.csie.ntu.edu.tw/~cjlin/libsvm/
 
 [oscPack]: http://www.rossbencina.com/code/oscpack
+
+[Eigen]: http://eigen.tuxfamily.org/
 
 ### References
 
